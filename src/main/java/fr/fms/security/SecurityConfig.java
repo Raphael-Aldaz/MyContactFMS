@@ -41,6 +41,7 @@ public class SecurityConfig {
         http.authorizeRequests()
                 .antMatchers("/").permitAll()
                 .antMatchers("/login").permitAll()
+                .antMatchers("/new-contact").hasAnyRole("USER", "ADMIN")
                 .and()
                 .formLogin()
                 .permitAll()

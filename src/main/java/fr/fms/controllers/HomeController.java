@@ -1,5 +1,6 @@
 package fr.fms.controllers;
 
+import fr.fms.entities.Category;
 import fr.fms.entities.Contact;
 import fr.fms.entities.User;
 import fr.fms.repositories.CategoryRepository;
@@ -16,7 +17,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -35,7 +38,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model, @RequestParam(name="page", defaultValue="0") int page,
-                       @RequestParam(name="keyword", defaultValue="") String kw,
+                       @RequestParam(name="kw", defaultValue="") String kw,
                        @RequestParam(name="idCat", defaultValue="0") Long idCat) {
 
         Page<Contact> contactsList = null;
@@ -78,7 +81,38 @@ public class HomeController {
         model.addAttribute("pages", new int[contactsToUse.getTotalPages()]);
         return "main";
 
+    }
 
+    @GetMapping("/new-contact")
+    public String contact(Model model){
+        List<Category> categories = categoryRepository.findAll();
+        Long userId = null;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = auth.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            User user = userRepository.findByUsername(userDetails.getUsername());
 
+                userId = user.getId();
+
+        }
+        model.addAttribute("userId", userId);
+        model.addAttribute("categories", categories);
+        model.addAttribute("newContact", new Contact());
+
+        return "contact";
+    }
+    @PostMapping("/saveContact")
+    public String saveContact(Contact newContact, BindingResult bindingResult){
+
+        if(bindingResult.hasErrors()) return "contact";
+        contactRepository.save(newContact);
+        return "redirect:/?page=0";
+    }
+
+    @GetMapping("/delete-contact")
+    public String deleteContact(Long idContact, int page){
+        contactRepository.deleteById(idContact);
+        return "redirect:/?page="+page;
     }
 }
