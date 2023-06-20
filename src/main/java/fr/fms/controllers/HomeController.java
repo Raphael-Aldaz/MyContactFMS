@@ -5,6 +5,8 @@ import fr.fms.entities.User;
 import fr.fms.repositories.CategoryRepository;
 import fr.fms.repositories.ContactRepository;
 import fr.fms.repositories.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,27 +30,55 @@ public class HomeController {
     private CategoryRepository categoryRepository;
     @Autowired
     private UserRepository userRepository;
-    @GetMapping("/")
-    public String home(Model model, @RequestParam(name="page", defaultValue="0") int page){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
+    private final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
-        if (auth.isAuthenticated()) {
-            List<User> users = userRepository.findByUsername(username);
-            if (!users.isEmpty()) {
-                User userId = users.get(0);
-                System.out.println(userId);
+
+    @GetMapping("/")
+    public String home(Model model, @RequestParam(name="page", defaultValue="0") int page,
+                       @RequestParam(name="keyword", defaultValue="") String kw,
+                       @RequestParam(name="idCat", defaultValue="0") Long idCat) {
+
+        Page<Contact> contactsList = null;
+        Page<Contact> contactsListOfUser = null;
+        PageRequest pageRequest = PageRequest.of(page, 8, Sort.by("contactName").descending());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = auth.getPrincipal();
+
+
+        if (principal instanceof UserDetails) {
+
+            UserDetails userDetails = (UserDetails) principal;
+            User user = userRepository.findByUsername(userDetails.getUsername());
+
+            if(!kw.isEmpty()) {
+                contactsListOfUser = contactRepository.findByContactNameContainsAndUserId(kw,user.getId(), pageRequest);
+            } else if(idCat > 0) {
+                contactsListOfUser = contactRepository.findByCategoryIdAndUserId(idCat,user.getId(), pageRequest);
+            } else {
+                contactsListOfUser = contactRepository.findByUserId(user.getId(), pageRequest);
+            }
+
+        } else if (principal instanceof String) {
+
+            if(!kw.isEmpty()) {
+                contactsList = contactRepository.findByContactNameContains(kw, pageRequest);
+            } else if(idCat > 0) {
+                contactsList = contactRepository.findByCategoryId(idCat, pageRequest);
+            } else {
+                contactsList = contactRepository.findAll(pageRequest);
             }
         } else {
-            PageRequest pageRequest = PageRequest.of(page, 8, Sort.by("contactName").descending());
-            Page<Contact> contactsList = contactRepository.findAll(pageRequest);
-
-            model.addAttribute("contacts", contactsList.getContent());
-            model.addAttribute("currentPage", page);
-            model.addAttribute("pages", new int[contactsList.getTotalPages()]);
+            logger.warn("Unknown principal type: ", principal.getClass());
         }
 
-
+        Page<Contact> contactsToUse = (contactsListOfUser != null) ? contactsListOfUser : contactsList;
+        assert contactsToUse != null;
+        model.addAttribute("contacts", contactsToUse.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pages", new int[contactsToUse.getTotalPages()]);
         return "main";
+
+
+
     }
 }
