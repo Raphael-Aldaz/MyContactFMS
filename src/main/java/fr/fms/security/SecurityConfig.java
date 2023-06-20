@@ -45,6 +45,9 @@ public class SecurityConfig {
                 .formLogin()
                 .permitAll()
                 .and()
+                .logout()
+                .logoutSuccessUrl("/")
+                .and()
                 .csrf().disable();
 
         return http.build();

@@ -27,10 +27,6 @@ public class Contact {
 
     @ManyToOne
     private Category category;
-
     @ManyToOne
     private User user;
-
-
-
 }

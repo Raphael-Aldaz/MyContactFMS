@@ -20,6 +20,10 @@ public class User {
     @NotNull
     private String password;
     @NotNull
+    private String email;
+
+    private String photo;
+    @NotNull
     private Boolean userStatus;
 
     @OneToMany(mappedBy = "user")

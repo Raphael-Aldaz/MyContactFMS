@@ -20,6 +20,4 @@ public class Category {
 
     @OneToMany(mappedBy = "category")
     private Collection<Contact> contacts;
-
-
 }
