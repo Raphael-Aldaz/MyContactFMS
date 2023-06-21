@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Controller
@@ -60,6 +61,7 @@ public class HomeController {
             } else {
                 contactsListOfUser = contactRepository.findByUserId(user.getId(), pageRequest);
             }
+            model.addAttribute("user", user);
 
         } else if (principal instanceof String) {
 
@@ -83,8 +85,9 @@ public class HomeController {
 
     }
 
-    @GetMapping("/new-contact")
-    public String contact(Model model){
+    @GetMapping("/contact")
+    public String contact(Model model,
+                          @RequestParam( required = false ,name = "idContact")  Long idContact){
         List<Category> categories = categoryRepository.findAll();
         Long userId = null;
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -96,9 +99,20 @@ public class HomeController {
                 userId = user.getId();
 
         }
+        if(idContact == null){
+            model.addAttribute("newContact", new Contact());
+        } else {
+            Optional<Contact> optionalContact = contactRepository.findById(idContact);
+            if(!optionalContact.isPresent()){
+                return "redirect:/";
+            } else {
+                Contact contact = optionalContact.get();
+                model.addAttribute("newContact", contact);
+            }
+        }
         model.addAttribute("userId", userId);
         model.addAttribute("categories", categories);
-        model.addAttribute("newContact", new Contact());
+
 
         return "contact";
     }
@@ -106,7 +120,21 @@ public class HomeController {
     public String saveContact(Contact newContact, BindingResult bindingResult){
 
         if(bindingResult.hasErrors()) return "contact";
-        contactRepository.save(newContact);
+        if(newContact.getId() == null){
+            contactRepository.save(newContact);
+        } else {
+            Optional<Contact> optionalContact = contactRepository.findById(newContact.getId());
+            if(optionalContact.isPresent()){
+                Contact contact = optionalContact.get();
+                contact.setContactName(newContact.getContactName());
+                contact.setContactEmail(newContact.getContactEmail());
+                contact.setContactPhone(newContact.getContactPhone());
+                contact.setCategory(newContact.getCategory());
+                contact.setContactPhoto(newContact.getContactPhoto());
+                contactRepository.save(contact);
+            }
+        }
+
         return "redirect:/?page=0";
     }
 

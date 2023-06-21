@@ -13,11 +13,13 @@
   <title>MyContact</title>
 </head>
 <body>
-<div layout:fragment="content">
+<div layout:fragment="content" class="w-full">
   <section class="max-w-4xl p-6 mx-auto bg-indigo-600 rounded-md shadow-md dark:bg-gray-800 mt-20">
     <h1 class="text-xl font-bold text-white capitalize dark:text-white">Account settings</h1>
     <form th:object="${newContact}" th:action="@{/saveContact}" method="post">
       <input type="hidden" th:name="user" th:value="${userId}" />
+      <input type="hidden" th:name="id" th:value="${newContact.id}" />
+
       <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
         <div>
           <label class="text-white dark:text-gray-200" >Name</label>
@@ -36,7 +38,7 @@
 
         <div>
           <label class="text-white dark:text-gray-200" >Phone Number</label>
-          <input th:value="${newContact.contactEmail}" name="contactPhone"  type="tel" class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring">
+          <input th:value="${newContact.contactPhone}" name="contactPhone"  type="tel" class="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-500 focus:outline-none focus:ring">
         </div>
 
         <div>
@@ -45,9 +47,8 @@
             <option th:each="cat : ${categories}"
                     th:text="${cat.categoryName}"
                     th:value="${cat.id}"
-                    th:selected="${newContact.category != null ? cat.id == newContact.category.id : cat.id == 0}"
-            ></option>
-
+                    th:selected="${newContact.category != null ? cat.id == newContact.category.id : cat.id == 0}">
+            </option>
           </select>
         </div>
 
@@ -63,7 +64,7 @@
               <div class="flex text-sm text-gray-600">
                 <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                   <span class="">Upload a file</span>
-                  <input id="file-upload" name="file-upload" type="file" class="sr-only">
+                  <input id="file-upload" name="contactPhoto" type="text" class="sr-only" th:value="${newContact.contactPhoto}">
                 </label>
                 <p class="pl-1 text-white">or drag and drop</p>
               </div>
