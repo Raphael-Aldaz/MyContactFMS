@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security5"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
+  <link th:href="@{/main.css}" >
+  <title>MyContact</title>
+</head>
+<body>
+<div layout:fragment="content" class="w-full" >
+  <div th:each="user : ${userList}" class="m-8">
+    <ul class="max-w-xs flex flex-col">
+      <li th:text="${user.username}" class="inline-flex items-center gap-x-2 py-3 px-4 text-sm font-medium bg-white border text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+      </li>
+      <li th:text="${user.email}" class="inline-flex items-center gap-x-2 py-3 px-4 text-sm font-medium bg-white border text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+      </li>
+      <button class="rounded px-4 py-2"
+              th:classappend="${user.userStatus == true ? 'bg-green-700 text-white' : 'bg-red-700 text-white'}">
+        Status
+      </button>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

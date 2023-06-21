@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
 
@@ -143,4 +146,28 @@ public class HomeController {
         contactRepository.deleteById(idContact);
         return "redirect:/?page="+page;
     }
+
+    @GetMapping("/login")
+    public String login(){
+        return "login";
+    }
+    @PostMapping("/login")
+    public String processLogin(@RequestParam("username") String username, @RequestParam("password") String password) {
+        return "main";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null){
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        return "redirect:/login";
+    }
+
+    @GetMapping("/403")
+    public String page403() {
+        return "403";
+    }
+
 }

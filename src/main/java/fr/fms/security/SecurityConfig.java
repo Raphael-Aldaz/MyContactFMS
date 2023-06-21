@@ -39,18 +39,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/new-contact").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/404", "/test","/", "/login").permitAll()
+                .antMatchers("/contact").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/admin").hasRole("ADMIN")
                 .and()
                 .formLogin()
+                .loginPage("/login")
                 .permitAll()
-                .and()
-                .logout()
-                .logoutSuccessUrl("/")
-                .and()
-                .csrf().disable();
 
+                .and()
+                .exceptionHandling().accessDeniedPage("/403");
         return http.build();
     }
 

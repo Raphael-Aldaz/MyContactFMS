@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html  xmlns:th="http://www.thymeleaf.org"
-       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -62,7 +63,7 @@
         </svg>
         <p class="text-base leading-4  ">Messages</p>
       </button>
-      <button class="flex justify-start items-center space-x-6 hover:text-white focus:bg-gray-700 focus:text-white hover:bg-gray-700 text-gray-400 rounded px-3 py-2 w-full md:w-52">
+      <a type="button" th:href="@{/admin}" class="flex justify-start items-center space-x-6 hover:text-white focus:bg-gray-700 focus:text-white hover:bg-gray-700 text-gray-400 rounded px-3 py-2 w-full md:w-52">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M14 8.00002C15.1046 8.00002 16 7.10459 16 6.00002C16 4.89545 15.1046 4.00002 14 4.00002C12.8954 4.00002 12 4.89545 12 6.00002C12 7.10459 12.8954 8.00002 14 8.00002Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
           <path d="M4 6H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -75,7 +76,7 @@
           <path d="M19 18H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         <p class="text-base leading-4  ">Settings</p>
-      </button>
+      </a>
       <button class="flex justify-start items-center space-x-6 hover:text-white focus:bg-gray-700 focus:text-white hover:bg-gray-700 text-gray-400 rounded px-3 py-2  w-full md:w-52">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M10 6H7C6.46957 6 5.96086 6.21071 5.58579 6.58579C5.21071 6.96086 5 7.46957 5 8V17C5 17.5304 5.21071 18.0391 5.58579 18.4142C5.96086 18.7893 6.46957 19 7 19H16C16.5304 19 17.0391 18.7893 17.4142 18.4142C17.7893 18.0391 18 17.5304 18 17V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -101,10 +102,9 @@
           <img class="rounded-full" src="https://i.ibb.co/L1LQtBm/Ellipse-1.png" alt="avatar" />
         </div>
         <div class="flex justify-start flex-col items-start">
-          <p class="cursor-pointer text-sm leading-5 text-white" th:text="${#authentication.name}"></p>
-          <a class="cursor-pointer text-xs leading-3 text-gray-300" th:href="${#request.isUserInRole('ROLE_USER')} ? @{/logout} : @{/login}" th:text="${#request.isUserInRole('ROLE_USER')} ? 'Déconnexion' : 'Connexion'">
-
-          </a>
+          <p class="cursor-pointer text-sm leading-5 text-white" th:if="${#request.userPrincipal != null}" th:text="${#authentication.name}"></p>
+          <p class="cursor-pointer text-sm leading-5 text-white" th:unless="${#request.userPrincipal != null}">Bonjour</p>
+          <a class="cursor-pointer text-xs leading-3 text-gray-300" th:href="${#request.userPrincipal != null} ? @{/logout} : @{/login}" th:text="${#request.userPrincipal != null} ? 'Déconnexion' : 'Connexion'"></a>
         </div>
       </div>
 
