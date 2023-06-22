@@ -28,7 +28,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
 
-
+/**
+ * Home Controller. Using for mapping the home page
+ */
 @Controller
 public class HomeController {
     @Autowired
@@ -39,7 +41,14 @@ public class HomeController {
     private UserRepository userRepository;
     private final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
-
+    /**
+     * Mapping the home page
+     * @param model
+     * @param page
+     * @param kw
+     * @param idCat
+     * @return list of contacts with different parameters and if the user is connected or not
+     */
     @GetMapping("/")
     public String home(Model model, @RequestParam(name="page", defaultValue="0") int page,
                        @RequestParam(name="kw", defaultValue="") String kw,
@@ -88,6 +97,13 @@ public class HomeController {
 
     }
 
+    /**
+     * Mapping the contact page
+     * @param model
+     * @param idContact
+     * @return the contact page with the contact to modify or a new contact
+     */
+
     @GetMapping("/contact")
     public String contact(Model model,
                           @RequestParam( required = false ,name = "idContact")  Long idContact){
@@ -119,6 +135,13 @@ public class HomeController {
 
         return "contact";
     }
+
+    /**
+     * Mapping the save contact page
+     * @param newContact
+     * @param bindingResult
+     * @return the main page
+     */
     @PostMapping("/saveContact")
     public String saveContact(Contact newContact, BindingResult bindingResult){
 
@@ -141,21 +164,44 @@ public class HomeController {
         return "redirect:/?page=0";
     }
 
+    /**
+     * Mapping the delete contact page
+     * @param idContact
+     * @param page
+     * @return the main page
+     */
     @GetMapping("/delete-contact")
     public String deleteContact(Long idContact, int page){
         contactRepository.deleteById(idContact);
         return "redirect:/?page="+page;
     }
 
+    /**
+     * Mapping the login page
+     * @return the login page
+     */
     @GetMapping("/login")
     public String login(){
         return "login";
     }
+
+    /**
+     * Mapping the process login page
+     * @param username
+     * @param password
+     * @return the main page
+     */
     @PostMapping("/login")
     public String processLogin(@RequestParam("username") String username, @RequestParam("password") String password) {
         return "main";
     }
 
+    /**
+     * Mapping the logout page
+     * @param request
+     * @param response
+     * @return the login page
+     */
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -165,6 +211,20 @@ public class HomeController {
         return "redirect:/login";
     }
 
+    /**
+     * Mapping the error page
+     * @return the error page
+     */
+
+    @GetMapping("/error")
+    public String pageError() {
+        return "404";
+    }
+
+    /**
+     * Mapping the 403 page (access denied)
+     * @return  the 403 page
+     */
     @GetMapping("/403")
     public String page403() {
         return "403";
